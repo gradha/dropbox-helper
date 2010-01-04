@@ -87,6 +87,10 @@ def main():
 	directory, to_process = process_arguments(sys.argv)
 	to_clipboard = []
 	for path in map(os.path.realpath, to_process):
+		if not os.path.isfile(path):
+			print "Error, invalid file %r" % (path)
+			continue
+
 		if is_already_in_dropbox(path):
 			url = path_to_url(path)
 		else:
