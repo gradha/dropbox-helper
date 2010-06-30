@@ -24,6 +24,8 @@ def process_arguments(argv):
 	Returns the relative directory to put files and the files themselves.
 	"""
 	parser = optparse.OptionParser()
+	parser.add_option("-m", "--move", dest="move", action="store_true",
+		default = False, help = "delete source after successful copy")
 	parser.add_option("-d", "--dir", dest="dir", default = u"t",
 		help = "subdirectory where you want the files placed.")
 	(options, args) = parser.parse_args()
@@ -35,7 +37,8 @@ def process_arguments(argv):
 		sys.exit(1)
 
 	encoding = sys.getfilesystemencoding()
-	return (unicode(options.dir),
+	options.dir = unicodedata.normalize("NFC", options.dir.decode(encoding))
+	return (options,
 		[unicodedata.normalize("NFC", x.decode(encoding)) for x in args])
 
 
@@ -84,7 +87,7 @@ def main():
 
 	Main entry point of the application.
 	"""
-	directory, to_process = process_arguments(sys.argv)
+	options, to_process = process_arguments(sys.argv)
 	to_clipboard = []
 	for path in map(os.path.realpath, to_process):
 		if not os.path.isfile(path):
@@ -94,7 +97,9 @@ def main():
 		if is_already_in_dropbox(path):
 			url = path_to_url(path)
 		else:
-			url = copy_to_dropbox(directory, path)
+			url = copy_to_dropbox(options.dir, path)
+			if options.move:
+				os.unlink(path)
 
 		to_clipboard.append(url)
 		print url
