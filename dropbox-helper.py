@@ -35,8 +35,8 @@ def process_arguments(argv):
 		sys.exit(1)
 
 	encoding = sys.getfilesystemencoding()
-	return options.dir, [unicodedata.normalize("NFC", x.decode(encoding))
-		for x in args]
+	return (unicode(options.dir),
+		[unicodedata.normalize("NFC", x.decode(encoding)) for x in args])
 
 
 def copy_to_dropbox(relative_directory, source_path):
