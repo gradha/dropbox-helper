@@ -28,9 +28,11 @@ def process_arguments(argv):
 		default = False, help = "delete source after successful copy")
 	parser.add_option("-d", "--dir", dest="dir", default = u"t",
 		help = "subdirectory where you want the files placed.")
+	parser.add_option("-s", "--space", dest="space", action="store_true",
+		default = False, help = "show used space and exit")
 	(options, args) = parser.parse_args()
 
-	if not args:
+	if not args and not options.space:
 		print "Specify some files, please."
 		print "Base URL %s" % PUBLIC_BASE
 		parser.print_help()
@@ -82,12 +84,36 @@ def is_already_in_dropbox(path):
 		return False
 
 
+def calculate_space():
+	"""f() -> None
+
+	Iterates through the dropbox folder and shows total size.
+	"""
+	path = os.path.expanduser(u"~/Dropbox")
+	print "Calculating sizes"
+	total = 0
+	paths = []
+	for root, dirs, files in os.walk(path, followlinks = True):
+		current = sum([os.path.getsize(os.path.join(root, name))
+			for name in files])
+		paths.append((current, root))
+		total += current
+	paths.sort()
+	for current, root in paths:
+		print "%r consumes %0.03f MB" % (root, current / (1024 * 1024.0))
+	print "Total %0.03f GB" % (total / 1024.0 / 1024.0 / 1024.0)
+
+
 def main():
 	"""f() -> None
 
 	Main entry point of the application.
 	"""
 	options, to_process = process_arguments(sys.argv)
+	if options.space:
+		calculate_space()
+		return
+
 	to_clipboard = []
 	for path in map(os.path.realpath, to_process):
 		if not os.path.isfile(path):
