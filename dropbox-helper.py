@@ -74,11 +74,16 @@ def path_to_url(path):
 def is_already_in_dropbox(path):
 	"""f(string) -> bool
 
-	Returns True if the file is already in the Dropbox folder.
+	Returns True if the file is already in the Dropbox folder. Due to some
+	weird macosx situation, sometimes realpath returns a bad case for the
+	filesystem, where the Dropbox directory will be returned as dropbox
+	(different case). Since I'm not picky, perform the path comparison in lower
+	case always, which seems to patch this bug just about right.
 	"""
 	assert isinstance(path, unicode)
 	real_path = os.path.realpath(path)
-	if real_path[:len(DROPBOX_BASE)] == DROPBOX_BASE:
+	real_path = real_path[:len(DROPBOX_BASE)].lower()
+	if real_path == DROPBOX_BASE.lower():
 		return True
 	else:
 		return False
