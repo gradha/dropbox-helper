@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# vim:tabstop=4 shiftwidth=4 encoding=utf-8
 """Dropbox helper.
 """
 
@@ -15,6 +14,7 @@ import urllib
 
 
 DROPBOX_BASE = os.path.expanduser(u"~/Dropbox/Public/")
+# TODO: Add option to show size of cache folder.
 PUBLIC_BASE = u"http://dl.dropbox.com/u/145894/"
 
 
@@ -116,7 +116,7 @@ def main():
 
 	to_clipboard = []
 	for path in map(os.path.realpath, to_process):
-		if not os.path.isfile(path):
+		if not os.path.isfile(unicode(path)):
 			print "Error, invalid file %r" % (path)
 			continue
 
@@ -140,3 +140,5 @@ if "__main__" == __name__:
 	logging.basicConfig(level = logging.INFO)
 	#logging.basicConfig(level = logging.DEBUG)
 	main()
+
+# vim:tabstop=4 shiftwidth=4
